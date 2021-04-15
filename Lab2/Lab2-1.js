@@ -74,7 +74,6 @@ window.onload = function init() {
    gl.enable(gl.DEPTH_TEST);
 
    //  Load shaders and initialize attribute buffers
-   var typeOfShader = document.getElementById("typeOfShader").value;
    if(document.getElementById("gouraud").checked)
    {
 		program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
