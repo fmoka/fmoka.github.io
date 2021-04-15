@@ -5,7 +5,7 @@
 
     <!-- This in-line script is a vertex shader resource
          Shaders can be linked from an external file as well. -->
-    <script id="vertex-shader" type="x-shader/x-vertex">
+    <script id="phong-vertex-shader" type="x-shader/x-vertex">
 //diffuse and ambient multi-light shader
 
 //inputs
@@ -44,7 +44,7 @@ void main()
 	
 	<!-- This in-line script is a fragment shader resource.
          Shaders can be linked from an external file as well. -->
-    <script id="fragment-shader" type="x-shader/x-fragment">
+    <script id="phong-fragment-shader" type="x-shader/x-fragment">
 
 precision mediump float;
 varying vec4 color;
