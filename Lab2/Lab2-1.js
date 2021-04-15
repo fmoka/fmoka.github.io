@@ -1,7 +1,8 @@
-/*
- * batSpin.js
+*
+ * L5-2.js
  * Demonstrate lighting.
  *
+ * Adapted for WebGL by Alex Clarke, 2016, updated 2017
  */
 
 
@@ -70,16 +71,15 @@ window.onload = function init() {
    //  Configure WebGL
    //  eg. - set a clear color
    //      - turn on depth testing
-   gl.clearColor(1.0, 1.0, 1.0, 1.0);
+   gl.clearColor(0.25, 0.25, 0.25, 1);
    gl.enable(gl.DEPTH_TEST);
 
    //  Load shaders and initialize attribute buffers
-   program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
+   program = initShaders(gl, "vertex-shader", "fragment-shader");
    gl.useProgram(program);
 
    // Set up data to draw
    // Done globally in this program...
-   gl.clearColor(0.25, 0.25, 0.25, 1);
 
    // Load the data into GPU data buffers and
    // Associate shader attributes with corresponding data buffers
@@ -120,11 +120,14 @@ window.onload = function init() {
    p = perspective(45.0, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
    gl.uniformMatrix4fv(projLoc, gl.FALSE, flatten(p));
 
+   /////
+   //Add code here to get and set global ambient uniforms
+   /////
 
    // Get and set light uniforms
    light = []; // array of light property locations (defined globally)
-   var n = 1; // number of lights - adjust to match shader
-   for (var i = 0; i < n; i++) {
+   var nLights = 1; // number of lights - adjust to match shader
+   for (var i = 0; i < nLights; i++) {
       light[i] = {}; // initialize this light object
       light[i].diffuse = gl.getUniformLocation(program, "light[" + i + "].diffuse");
       light[i].specular = gl.getUniformLocation(program, "light[" + i + "].specular");
@@ -136,8 +139,8 @@ window.onload = function init() {
          gl.uniform4fv(light[i].diffuse, white);
          gl.uniform4fv(light[i].specular, white);
          gl.uniform4fv(light[i].ambient, vec4(0.2, 0.2, 0.2, 1.0));
-         gl.uniform4fv(light[i].position, vec4(3.0, 3.0, 0.0, 1.0));
-         light[0].rotY = 0;
+         light[0].pos = vec4( 0,2,1,1);
+         gl.uniform4fv(light[i].position, light[0].pos);
       } else //disable all other lights
       {
          gl.uniform4fv(light[i].diffuse, black);
@@ -154,11 +157,20 @@ window.onload = function init() {
    material.ambient = gl.getUniformLocation(program, "material.ambient");
    material.shininess = gl.getUniformLocation(program, "material.shininess");
 
-   var diffuseColor = vec4(0.25, 0.3, 0.35, 1.0);
+   /////
+   //Add or modify colours here to set a default material for the objects in the scene
+   //Name of material: 
+   /////
+   var diffuseColor = vec4(0.5, 0.5, 0.5, 1.0);
+   var specularColor = diffuseColor;
    gl.uniform4fv(material.diffuse, diffuseColor);
-   gl.uniform4fv(material.specular, white);
+   gl.uniform4fv(material.specular, specularColor);
    gl.uniform4fv(material.ambient, diffuseColor);
    gl.uniform1f(material.shininess, 50.0);
+
+   /////
+   //Add code to get global ambient uniforms and set their initial state
+   /////
 
    // Get and set other shader state
    lighting = gl.getUniformLocation(program, "lighting");
@@ -167,20 +179,13 @@ window.onload = function init() {
    gl.uniform4fv(uColor, white);
 
 
-   // ** setup event listeners and UI
-   // Light rotY (direction) slider
-	var ele = document.getElementById("rotY");
-	ele.onchange = ele.oninput = function(event) {
-      light[0].rotY=(event.srcElement || event.target).value;
-      document.getElementById("directionval").innerHTML = light[0].rotY;
-   };
-   ele.value = 0;
-   document.getElementById("directionval").innerHTML = 0;
 
+   // ** setup event listeners for UI
+   // ** and setup initial values to match default state where convenient
 
    // Specular shininess slider
-	ele = document.getElementById("shininess");
-	ele.onchange = ele.oninput = function(event) {
+   var ele = document.getElementById("shininess");
+   ele.oninput = ele.onchange = function (event) {
       var shininess = (event.srcElement || event.target).value;
       document.getElementById("shininessval").innerHTML = shininess;
       gl.uniform1f(material.shininess, shininess);
@@ -189,48 +194,59 @@ window.onload = function init() {
    document.getElementById("shininessval").innerHTML = 50;
 
    // Sphere resolution slider
-	ele = document.getElementById("rez");
-	ele.onchange = ele.oninput = function(event) {
+   ele = document.getElementById("rez");
+   ele.oninput = ele.onchange = function (event) {
       rez = (event.srcElement || event.target).value;
       document.getElementById("rezval").innerHTML = rez;
    };
-   ele.value = rez;
-   document.getElementById("rezval").innerHTML = rez;
+   ele.value = 10;
+   document.getElementById("rezval").innerHTML = 10;
 
    // Diffuse colour picker - set initial value
    document.getElementById("diffuseColor").jscolor.fromRGB(
-			diffuseColor[0] * 255, 
-			diffuseColor[1] * 255, 
-			diffuseColor[2] * 255);
+         diffuseColor[0] * 255, 
+         diffuseColor[1] * 255, 
+         diffuseColor[2] * 255);
 
    // Specular colour picker - set initial value
-   document.getElementById("specularColor").jscolor.fromHSV(
-			specularColor[0] * 255, 
-			specularColor[1] * 255, 
-			specularColor[2] * 255);
+   document.getElementById("specularColor").jscolor.fromRGB(
+         specularColor[0] * 255, 
+         specularColor[1] * 255, 
+         specularColor[2] * 255);
 
-   requestAnimFrame(render);
+   /////
+   //Add code here to register event listeners for the global ambient controls
+   //    and
+   //Add code here to set initial UI values for the global ambient UI controls
+   /////
+
+
+
+   requestAnimFrame(animate);
 };
 
 
 
-// Event listener for specular color picker - look in HTML to see where it is registered
+// Event listener for specular colour picker - look in HTML to see where it is registered
 function setSpecularColor(picker) {
    gl.uniform4f(material.specular, picker.rgb[0] / 255.0, picker.rgb[1] / 255.0, picker.rgb[2] / 255.0, 1);
 }
 
-// Event listener for diffuse and ambient color picker - look in HTML to see where it is registered
+// Event listener for diffuse and ambient colour picker - look in HTML to see where it is registered
 function setDiffuseColor(picker) {
    gl.uniform4f(material.diffuse, picker.rgb[0] / 255.0, picker.rgb[1] / 255.0, picker.rgb[2] / 255.0, 1);
    gl.uniform4f(material.ambient, picker.rgb[0] / 255.0, picker.rgb[1] / 255.0, picker.rgb[2] / 255.0, 1);
 }
 
+/////
+//Add event listeners for global ambient top and bottom colour pickers
+/////
 
 
 //----------------------------------------------------------------------------
 // Rendering Event Function
 //----------------------------------------------------------------------------
-var rx = 0,  ry = 0;
+var ry = 0;
 
 function render()
 {
@@ -244,9 +260,20 @@ function render()
 
    mv = lookAt(eye, at, up);
 
+
+   /////
+   //Add code to set global hemisphere light direction
+   /////
+
    //Position Light in World
-   gl.uniform4fv(light[0].position,
-         mult(transpose(mv), mult(rotate(light[0].rotY,vec3(0,1,0)),vec4( 1,1,0,0))));
+   gl.uniform4fv(light[0].position, mult(transpose(mv), light[0].pos));
+   var lightSphereTF = mult(mv, translate(light[0].pos[0], light[0].pos[1], light[0].pos[2] ));
+   lightSphereTF = mult(lightSphereTF, scale(0.05, 0.05, 0.05));
+   gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(lightSphereTF));
+   gl.uniform1i(lighting, 0);
+   urgl.drawSolidSphere(1, rez, rez);
+   gl.uniform1i(lighting, 1);
+
 
    //rebind local buffers to shader
    //necessary if uofrGraphics draw functions are used
@@ -268,7 +295,113 @@ function render()
    gl.uniformMatrix4fv(mvLoc, gl.FALSE, flatten(sphereTF));
    urgl.drawSolidSphere(1, rez, rez);
 
-   ry += 0.5;
+}
 
-   requestAnimFrame(render);
+
+//----------------------------------------------------------------------------
+// Animation and Rendering Event Functions
+//----------------------------------------------------------------------------
+
+//animate()
+//updates and displays the model based on elapsed time
+//sets up another animation event as soon as possible
+var prevTime = 0;
+function animate()
+{
+   requestAnimFrame(animate);
+
+   //Do time corrected animation
+   var curTime = new Date().getTime();
+   if (prevTime != 0)
+   {
+      //Calculate elapsed time in seconds
+      var timePassed = (curTime - prevTime)/1000.0;
+      //Update any active animations 
+      handleKeys(timePassed);
+   }
+   prevTime = curTime;
+
+   //Draw
+   render();
+}
+
+//----------------------------------------------------------------------------
+// Keyboard Event Functions
+//----------------------------------------------------------------------------
+
+//This array will hold the pressed or unpressed state of every key
+var currentlyPressedKeys = [];
+
+//Store current state of shift key
+var shift;
+
+document.onkeydown = function handleKeyDown(event) {
+   currentlyPressedKeys[event.key] = true;
+   shift = event.shiftKey;
+
+   //Place key down detection code here
+}
+
+document.onkeyup = function handleKeyUp(event) {
+   currentlyPressedKeys[event.key] = false;
+   shift = event.shiftKey;
+
+   //Place key up detection code here
+}
+
+//isPressed(c)
+//Utility function to lookup whether a key is pressed
+function isPressed(c)
+{
+   return currentlyPressedKeys[c];
+}
+
+//handleKeys(timePassed)
+//Continuously called from animate to cause model updates based on
+//any keys currently being held down
+//timePassed is expected to be in seconds
+function handleKeys(timePassed) 
+{
+   //Place continuous key actions here - anything that should continue while a key is
+   //held
+
+   //Calculate how much to move based on time since last update
+   var vb = 2.0; //Base velocity for light ball
+   var db = vb*timePassed; //Distance to move
+   var rr = 60.0; //Batman's rotation speed
+   var ar = rr*timePassed;
+
+   //Light Updates
+   if (isPressed("a") || isPressed("A")) 
+   {
+      light[0].pos[0] -= db;
+   }
+   if (isPressed("d") || isPressed("D")) 
+   {
+      light[0].pos[0] += db;
+   }
+   if (isPressed("w") || isPressed("W")) 
+   {
+      light[0].pos[2] -= db;
+   }
+   if (isPressed("s") || isPressed("S")) 
+   {
+      light[0].pos[2] += db;
+   }
+   if (isPressed("q") || isPressed("Q")) 
+   {
+      light[0].pos[1] -= db;
+   }
+   if (isPressed("e") || isPressed("E")) 
+   {
+      light[0].pos[1] += db;
+   }
+   if (isPressed(",") || isPressed("<"))
+   {
+      ry -= 1;
+   }
+   if (isPressed(".") || isPressed(">"))
+   {
+      ry += ar;
+   }
 }
