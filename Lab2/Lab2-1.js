@@ -75,7 +75,7 @@ window.onload = function init() {
    gl.enable(gl.DEPTH_TEST);
 
    //  Load shaders and initialize attribute buffers
-   program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
+   program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
    gl.useProgram(program);
 
    // Set up data to draw
