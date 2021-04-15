@@ -74,8 +74,23 @@ window.onload = function init() {
    gl.enable(gl.DEPTH_TEST);
 
    //  Load shaders and initialize attribute buffers
-   program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
-   gl.useProgram(program);
+   var typeOfShader = document.getElementById("typeOfShader").value;
+   if(document.getElementById("gouraud").checked)
+   {
+		program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
+		gl.useProgram(program);
+   }
+	else if (document.getElementById("phong").checked)
+	{
+		program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
+		gl.useProgram(program);
+	}
+	else
+	{
+		document.getElementById("error").innerHTML   
+                    = "Oops! Something went wrong";  
+	}
+		
 
    // Set up data to draw
    // Done globally in this program...

@@ -271,5 +271,13 @@ vec4 lightCalc(in _light light)
     <button id="diffuseColor" class="jscolor {valueElement:'chosen-value', onFineChange:'setDiffuseColor(this)'}" style="width: 400px; height: 100px;">
 		Diffuse and Ambient Color
 	</button>
+	<h3> Choose the type of shader </h3>
+	<h4 id="error" style= "color:red"> </h4>
+	<form>
+		<input type = "radio" name = "typeOfShader" id = "gouraud" value = "Gouraud" >Gouraud <br>
+		<input type = "radio" name = "typeOfShader" id = "phong" value = "Phong" >Phong <br>
+	</form>
+		
+		
 </body>
 </html>
