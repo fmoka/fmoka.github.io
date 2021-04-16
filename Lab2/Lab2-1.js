@@ -73,26 +73,14 @@ window.onload = function init() {
    gl.clearColor(1.0, 1.0, 1.0, 1.0);
    gl.enable(gl.DEPTH_TEST);
 
-   //  Load shaders and initialize attribute buffers
-   radiobtn = document.getElementById("phong");
-   radiobtn.checked = true;
-   
-   if(document.getElementById("gouraud").checked)
-   {
-		program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
-		gl.useProgram(program);
-   }
-	else if (document.getElementById("phong").checked)
-	{
-		program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
-		gl.useProgram(program);
-	}
-	else
-	{
-		document.getElementById("error").innerHTML   
-                    = "Oops! Something went wrong";  
-	}
-		
+	//  Load shaders and initialize attribute buffers
+	phongButton = document.getElementById("phong");
+	phongButton.checked = true;
+	gouraudButton = document.getElementById("gouraud");
+	program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
+	gl.useProgram(program);
+	phongButton.addEventListener("event", OnRadioStateChange);
+	gouraudButton.addEventListener("event", OnRadioStateChange);
 
    // Set up data to draw
    // Done globally in this program...
@@ -242,7 +230,26 @@ function setDiffuseColor(picker) {
    gl.uniform4f(material.ambient, picker.rgb[0] / 255.0, picker.rgb[1] / 255.0, picker.rgb[2] / 255.0, 1);
 }
 
-
+function OnRadioStateChange(event)
+{
+	var radioButton = event.target;
+	if(radioButton.value == "Gouraud")
+	{
+		program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
+		gl.useProgram(program);
+		requestAnimFrame(render);
+	}
+	else if(radioButton.value == "Phong")
+	{
+		program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
+		gl.useProgram(program);
+		requestAnimFrame(render);
+	}
+	else
+	{
+		alert("Oops! Something went wrong.");
+	}
+}
 
 //----------------------------------------------------------------------------
 // Rendering Event Function
