@@ -74,7 +74,8 @@ window.onload = function init() {
    gl.enable(gl.DEPTH_TEST);
 
    //  Load shaders and initialize attribute buffers
-   document.getElementById("phong").checked = true;
+   radiobtn = document.getElementById("phong");
+   radiobtn.checked = true;
    
    if(document.getElementById("gouraud").checked)
    {
