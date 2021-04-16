@@ -79,8 +79,8 @@ window.onload = function init() {
 	gouraudButton = document.getElementById("gouraud");
 	program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
 	gl.useProgram(program);
-	phongButton.addEventListener("event", OnRadioStateChange);
-	gouraudButton.addEventListener("event", OnRadioStateChange);
+	phongButton.addEventListener("RadioStateChange", OnRadioStateChange);
+	gouraudButton.addEventListener("RadioStateChange", OnRadioStateChange);
 
    // Set up data to draw
    // Done globally in this program...
