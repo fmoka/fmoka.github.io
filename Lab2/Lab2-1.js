@@ -234,13 +234,13 @@ function OnRadioStateChange(event)
 	{
 		program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
 		gl.useProgram(program);
-		requestAnimFrame(render);
+		render();
 	}
 	else if(radioButton.value == "Phong")
 	{
 		program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
 		gl.useProgram(program);
-		requestAnimFrame(render);
+		render();
 	}
 	else
 	{
