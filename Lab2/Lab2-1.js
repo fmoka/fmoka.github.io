@@ -244,7 +244,6 @@ function OnRadioStateChange(event)
 	{
 		program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
 		gl.useProgram(program);
-		gl.useProgram(program);
 
    // Set up data to draw
    // Done globally in this program...
@@ -339,7 +338,6 @@ function OnRadioStateChange(event)
 	else if(radioButton.value == "Phong")
 	{
 		program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
-		gl.useProgram(program);
 		gl.useProgram(program);
 
    // Set up data to draw
