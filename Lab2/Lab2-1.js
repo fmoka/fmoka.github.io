@@ -74,8 +74,6 @@ window.onload = function init() {
    gl.enable(gl.DEPTH_TEST);
 
 	//  Load shaders and initialize attribute buffers
-	phongButton = document.getElementById("phong");
-	phongButton.checked = true;
 	program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
 	gl.useProgram(program);
 
@@ -199,16 +197,6 @@ window.onload = function init() {
    ele.value = rez;
    document.getElementById("rezval").innerHTML = rez;
    
-   
-	phongButton.onchange = ele.oninput = function(event) {
-      OnRadioStateChange(event);
-   };
-   
-   gouraudButton = document.getElementById("gouraud");
-   gouraudButton.onchange = ele.oninput = function(event) {
-      OnRadioStateChange(event);
-   };
-
    // Diffuse colour picker - set initial value
    document.getElementById("diffuseColor").jscolor.fromRGB(
 			diffuseColor[0] * 255, 
@@ -237,7 +225,7 @@ function setDiffuseColor(picker) {
    gl.uniform4f(material.ambient, picker.rgb[0] / 255.0, picker.rgb[1] / 255.0, picker.rgb[2] / 255.0, 1);
 }
 
-function OnRadioStateChange(event)
+function changeShader()
 {
 	var radioButton = event.target;
 	if(radioButton.value == "Gouraud")
@@ -256,9 +244,7 @@ function OnRadioStateChange(event)
    gl.enable(gl.DEPTH_TEST);
 
 	//  Load shaders and initialize attribute buffers
-	phongButton = document.getElementById("phong");
-	phongButton.checked = true;
-	program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
+	program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
 	gl.useProgram(program);
 
    // Set up data to draw
@@ -381,16 +367,6 @@ function OnRadioStateChange(event)
    ele.value = rez;
    document.getElementById("rezval").innerHTML = rez;
    
-   
-	phongButton.onchange = ele.oninput = function(event) {
-      OnRadioStateChange(event);
-   };
-   
-   gouraudButton = document.getElementById("gouraud");
-   gouraudButton.onchange = ele.oninput = function(event) {
-      OnRadioStateChange(event);
-   };
-
    // Diffuse colour picker - set initial value
    document.getElementById("diffuseColor").jscolor.fromRGB(
 			diffuseColor[0] * 255, 
@@ -419,8 +395,6 @@ function OnRadioStateChange(event)
    gl.enable(gl.DEPTH_TEST);
 
 	//  Load shaders and initialize attribute buffers
-	phongButton = document.getElementById("phong");
-	phongButton.checked = true;
 	program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
 	gl.useProgram(program);
 
@@ -543,16 +517,6 @@ function OnRadioStateChange(event)
    };
    ele.value = rez;
    document.getElementById("rezval").innerHTML = rez;
-   
-   
-	phongButton.onchange = ele.oninput = function(event) {
-      OnRadioStateChange(event);
-   };
-   
-   gouraudButton = document.getElementById("gouraud");
-   gouraudButton.onchange = ele.oninput = function(event) {
-      OnRadioStateChange(event);
-   };
 
    // Diffuse colour picker - set initial value
    document.getElementById("diffuseColor").jscolor.fromRGB(

@@ -272,10 +272,8 @@ vec4 lightCalc(in _light light)
 		Diffuse and Ambient Color
 	</button>
 	<h3> Choose the type of shader </h3>
-	<form>
-		<input type = "radio" name = "typeOfShader" id = "gouraud"  value = "Gouraud" >Gouraud <br>
-		<input type = "radio" name = "typeOfShader" id = "phong" value = "Phong" >Phong <br>
-	</form>
+	<input type = "radio" name = "typeOfShader" id = "gouraud"  value = "Gouraud" onclick = "changeShader()" >Gouraud <br>
+	<input type = "radio" name = "typeOfShader" id = "phong" value = "Phong" onclick = "changeShader()">Phong <br>
 		
 		
 </body>
