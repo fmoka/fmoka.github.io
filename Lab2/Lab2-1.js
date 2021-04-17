@@ -237,14 +237,14 @@ function changeShader()
 	{
 		vertexShader = "gouraud-vertex-shader";
 		fragmentShader = "gouraud-fragment-shader";
-		basicInit();
 	}
 	else
 	{
 		vertexShader = "phong-vertex-shader";
 		fragmentShader = "phong-fragment-shader";
-		basicInit();
 	}
+	
+	basicInit();
 }
 
 //----------------------------------------------------------------------------
