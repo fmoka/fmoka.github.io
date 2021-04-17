@@ -239,15 +239,11 @@ function changeShader()
 		fragmentShader = "gouraud-fragment-shader";
 		basicInit();
 	}
-	else if(radioButton.value == "Phong")
+	else(radioButton.value == "Phong")
 	{
 		vertexShader = "phong-vertex-shader";
 		fragmentShader = "phong-fragment-shader";
 		basicInit();
-	}
-	else
-	{
-		alert("Oops! Something went wrong.");
 	}
 }
 
