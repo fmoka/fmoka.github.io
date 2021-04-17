@@ -22,7 +22,8 @@ var lightblue = [0.5, 0.5, 1.0, 1.0];
 var white = [1.0, 1.0, 1.0, 1.0];
 var black = [0.0, 0.0, 0.0, 1.0];
 
-
+var vertexShader = "phong-vertex-shader";
+var fragmentShader = "phong-fragment-shader";
 
 //Variables for Transformation Matrices
 var mv = new mat4();
@@ -61,11 +62,11 @@ function bindBuffersToShader(obj) {
 
 window.onload = function init() {
 	
-	basicInit("phong-vertex-shader", "phong-fragment-shader");
+	basicInit();
     requestAnimFrame(render);
 };
 
-function basicInit(var vertex-shader, var fragment-shader)
+function basicInit()
 {
 	// Set up a WebGL Rendering Context in an HTML5 Canvas
    var canvas = document.getElementById("gl-canvas");
@@ -81,7 +82,7 @@ function basicInit(var vertex-shader, var fragment-shader)
    gl.enable(gl.DEPTH_TEST);
 
 	//  Load shaders and initialize attribute buffers
-	program = initShaders(gl, vertex-shader, fragment-shader);
+	program = initShaders(gl, vertexShader, fragmentShader);
 	gl.useProgram(program);
 
    // Set up data to draw
@@ -234,11 +235,15 @@ function changeShader()
 	var radioButton = event.target;
 	if(radioButton.value == "Gouraud")
 	{
-		basicInit("gouraud-vertex-shader", "gouraud-fragment-shader");
+		vertexShader = "gouraud-vertex-shader";
+		fragmentShader = "gouraud-fragment-shader";
+		basicInit();
 	}
 	else if(radioButton.value == "Phong")
 	{
-		basicInit("phong-vertex-shader", "phong-fragment-shader");
+		vertexShader = "phong-vertex-shader";
+		fragmentShader = "phong-fragment-shader";
+		basicInit();
 	}
 	else
 	{
