@@ -242,13 +242,329 @@ function OnRadioStateChange(event)
 	var radioButton = event.target;
 	if(radioButton.value == "Gouraud")
 	{
-		program = initShaders(gl, "gouraud-vertex-shader", "gouraud-fragment-shader");
-		requestAnimFrame(render);
+		// Set up a WebGL Rendering Context in an HTML5 Canvas
+   var canvas = document.getElementById("gl-canvas");
+   gl = WebGLUtils.setupWebGL(canvas);
+   if (!gl) {
+      alert("WebGL isn't available");
+   }
+
+   //  Configure WebGL
+   //  eg. - set a clear color
+   //      - turn on depth testing
+   gl.clearColor(1.0, 1.0, 1.0, 1.0);
+   gl.enable(gl.DEPTH_TEST);
+
+	//  Load shaders and initialize attribute buffers
+	phongButton = document.getElementById("phong");
+	phongButton.checked = true;
+	program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
+	gl.useProgram(program);
+
+   // Set up data to draw
+   // Done globally in this program...
+   gl.clearColor(0.25, 0.25, 0.25, 1);
+
+   // Load the data into GPU data buffers and
+   // Associate shader attributes with corresponding data buffers
+   //***Vertices***
+   program.vPosition = gl.getAttribLocation(program, "vPosition");
+   gl.enableVertexAttribArray(program.vPosition);
+
+   //***Normals***
+   program.vNormal = gl.getAttribLocation(program, "vNormal");
+   gl.enableVertexAttribArray(program.vNormal);
+
+   //** uofrGraphics setup
+   // relies on position and normal arrays
+   // stub is used instead of the simple diffuse colour that
+   // uofrGraphics was designed for, since we will be using
+   // a more complex shader
+   // uofrGraphics loads and binds its own buffers, so
+   // watch out if you mix it with your own hand written geometry...
+   urgl = new uofrGraphics();
+   urgl.connectShader(program, "vPosition", "vNormal", "stub");
+
+   //** start loading an obj.
+   // The obj's buffers will need to be bound to draw them
+   // see bindBuffersToShader() function for details.
+   obj = loadObj(gl, "BatmanArmoured.obj");
+
+
+   // Get addresses of transformation uniforms
+   projLoc = gl.getUniformLocation(program, "p");
+   mvLoc = gl.getUniformLocation(program, "mv");
+
+   //Set up viewport
+   gl.viewportWidth = canvas.width;
+   gl.viewportHeight = canvas.height;
+   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
+   //Set up projection matrix
+   p = perspective(45.0, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+   gl.uniformMatrix4fv(projLoc, gl.FALSE, flatten(p));
+
+
+   // Get and set light uniforms
+   light = []; // array of light property locations (defined globally)
+   var n = 1; // number of lights - adjust to match shader
+   for (var i = 0; i < n; i++) {
+      light[i] = {}; // initialize this light object
+      light[i].diffuse = gl.getUniformLocation(program, "light[" + i + "].diffuse");
+      light[i].specular = gl.getUniformLocation(program, "light[" + i + "].specular");
+      light[i].ambient = gl.getUniformLocation(program, "light[" + i + "].ambient");
+      light[i].position = gl.getUniformLocation(program, "light[" + i + "].position");
+
+      //initialize light 0 to default of white light coming from viewer
+      if (i == 0) {
+         gl.uniform4fv(light[i].diffuse, white);
+         gl.uniform4fv(light[i].specular, white);
+         gl.uniform4fv(light[i].ambient, vec4(0.2, 0.2, 0.2, 1.0));
+         gl.uniform4fv(light[i].position, vec4(3.0, 3.0, 0.0, 1.0));
+         light[0].rotY = 0;
+      } else //disable all other lights
+      {
+         gl.uniform4fv(light[i].diffuse, black);
+         gl.uniform4fv(light[i].specular, black);
+         gl.uniform4fv(light[i].ambient, black);
+         gl.uniform4fv(light[i].position, black);
+      }
+   }
+
+   // Get and set material uniforms
+   material = {};
+   material.diffuse = gl.getUniformLocation(program, "material.diffuse");
+   material.specular = gl.getUniformLocation(program, "material.specular");
+   material.ambient = gl.getUniformLocation(program, "material.ambient");
+   material.shininess = gl.getUniformLocation(program, "material.shininess");
+
+   var diffuseColor = vec4(0.25, 0.3, 0.35, 1.0);
+   gl.uniform4fv(material.diffuse, diffuseColor);
+   gl.uniform4fv(material.specular, white);
+   gl.uniform4fv(material.ambient, diffuseColor);
+   gl.uniform1f(material.shininess, 50.0);
+
+   // Get and set other shader state
+   lighting = gl.getUniformLocation(program, "lighting");
+   uColor = gl.getUniformLocation(program, "uColor");
+   gl.uniform1i(lighting, 1);
+   gl.uniform4fv(uColor, white);
+
+
+   // ** setup event listeners and UI
+   // Light rotY (direction) slider
+	var ele = document.getElementById("rotY");
+	ele.onchange = ele.oninput = function(event) {
+      light[0].rotY=(event.srcElement || event.target).value;
+      document.getElementById("directionval").innerHTML = light[0].rotY;
+   };
+   ele.value = 0;
+   document.getElementById("directionval").innerHTML = 0;
+
+
+   // Specular shininess slider
+	ele = document.getElementById("shininess");
+	ele.onchange = ele.oninput = function(event) {
+      var shininess = (event.srcElement || event.target).value;
+      document.getElementById("shininessval").innerHTML = shininess;
+      gl.uniform1f(material.shininess, shininess);
+   };
+   ele.value = 50;
+   document.getElementById("shininessval").innerHTML = 50;
+
+   // Sphere resolution slider
+	ele = document.getElementById("rez");
+	ele.onchange = ele.oninput = function(event) {
+      rez = (event.srcElement || event.target).value;
+      document.getElementById("rezval").innerHTML = rez;
+   };
+   ele.value = rez;
+   document.getElementById("rezval").innerHTML = rez;
+   
+   
+	phongButton.onchange = ele.oninput = function(event) {
+      OnRadioStateChange(event);
+   };
+   
+   gouraudButton = document.getElementById("gouraud");
+   gouraudButton.onchange = ele.oninput = function(event) {
+      OnRadioStateChange(event);
+   };
+
+   // Diffuse colour picker - set initial value
+   document.getElementById("diffuseColor").jscolor.fromRGB(
+			diffuseColor[0] * 255, 
+			diffuseColor[1] * 255, 
+			diffuseColor[2] * 255);
+
+   // Specular colour picker - set initial value
+   document.getElementById("specularColor").jscolor.fromHSV(
+			specularColor[0] * 255, 
+			specularColor[1] * 255, 
+			specularColor[2] * 255);
 	}
 	else if(radioButton.value == "Phong")
 	{
-		program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
-		requestAnimFrame(render);
+		// Set up a WebGL Rendering Context in an HTML5 Canvas
+   var canvas = document.getElementById("gl-canvas");
+   gl = WebGLUtils.setupWebGL(canvas);
+   if (!gl) {
+      alert("WebGL isn't available");
+   }
+
+   //  Configure WebGL
+   //  eg. - set a clear color
+   //      - turn on depth testing
+   gl.clearColor(1.0, 1.0, 1.0, 1.0);
+   gl.enable(gl.DEPTH_TEST);
+
+	//  Load shaders and initialize attribute buffers
+	phongButton = document.getElementById("phong");
+	phongButton.checked = true;
+	program = initShaders(gl, "phong-vertex-shader", "phong-fragment-shader");
+	gl.useProgram(program);
+
+   // Set up data to draw
+   // Done globally in this program...
+   gl.clearColor(0.25, 0.25, 0.25, 1);
+
+   // Load the data into GPU data buffers and
+   // Associate shader attributes with corresponding data buffers
+   //***Vertices***
+   program.vPosition = gl.getAttribLocation(program, "vPosition");
+   gl.enableVertexAttribArray(program.vPosition);
+
+   //***Normals***
+   program.vNormal = gl.getAttribLocation(program, "vNormal");
+   gl.enableVertexAttribArray(program.vNormal);
+
+   //** uofrGraphics setup
+   // relies on position and normal arrays
+   // stub is used instead of the simple diffuse colour that
+   // uofrGraphics was designed for, since we will be using
+   // a more complex shader
+   // uofrGraphics loads and binds its own buffers, so
+   // watch out if you mix it with your own hand written geometry...
+   urgl = new uofrGraphics();
+   urgl.connectShader(program, "vPosition", "vNormal", "stub");
+
+   //** start loading an obj.
+   // The obj's buffers will need to be bound to draw them
+   // see bindBuffersToShader() function for details.
+   obj = loadObj(gl, "BatmanArmoured.obj");
+
+
+   // Get addresses of transformation uniforms
+   projLoc = gl.getUniformLocation(program, "p");
+   mvLoc = gl.getUniformLocation(program, "mv");
+
+   //Set up viewport
+   gl.viewportWidth = canvas.width;
+   gl.viewportHeight = canvas.height;
+   gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
+   //Set up projection matrix
+   p = perspective(45.0, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
+   gl.uniformMatrix4fv(projLoc, gl.FALSE, flatten(p));
+
+
+   // Get and set light uniforms
+   light = []; // array of light property locations (defined globally)
+   var n = 1; // number of lights - adjust to match shader
+   for (var i = 0; i < n; i++) {
+      light[i] = {}; // initialize this light object
+      light[i].diffuse = gl.getUniformLocation(program, "light[" + i + "].diffuse");
+      light[i].specular = gl.getUniformLocation(program, "light[" + i + "].specular");
+      light[i].ambient = gl.getUniformLocation(program, "light[" + i + "].ambient");
+      light[i].position = gl.getUniformLocation(program, "light[" + i + "].position");
+
+      //initialize light 0 to default of white light coming from viewer
+      if (i == 0) {
+         gl.uniform4fv(light[i].diffuse, white);
+         gl.uniform4fv(light[i].specular, white);
+         gl.uniform4fv(light[i].ambient, vec4(0.2, 0.2, 0.2, 1.0));
+         gl.uniform4fv(light[i].position, vec4(3.0, 3.0, 0.0, 1.0));
+         light[0].rotY = 0;
+      } else //disable all other lights
+      {
+         gl.uniform4fv(light[i].diffuse, black);
+         gl.uniform4fv(light[i].specular, black);
+         gl.uniform4fv(light[i].ambient, black);
+         gl.uniform4fv(light[i].position, black);
+      }
+   }
+
+   // Get and set material uniforms
+   material = {};
+   material.diffuse = gl.getUniformLocation(program, "material.diffuse");
+   material.specular = gl.getUniformLocation(program, "material.specular");
+   material.ambient = gl.getUniformLocation(program, "material.ambient");
+   material.shininess = gl.getUniformLocation(program, "material.shininess");
+
+   var diffuseColor = vec4(0.25, 0.3, 0.35, 1.0);
+   gl.uniform4fv(material.diffuse, diffuseColor);
+   gl.uniform4fv(material.specular, white);
+   gl.uniform4fv(material.ambient, diffuseColor);
+   gl.uniform1f(material.shininess, 50.0);
+
+   // Get and set other shader state
+   lighting = gl.getUniformLocation(program, "lighting");
+   uColor = gl.getUniformLocation(program, "uColor");
+   gl.uniform1i(lighting, 1);
+   gl.uniform4fv(uColor, white);
+
+
+   // ** setup event listeners and UI
+   // Light rotY (direction) slider
+	var ele = document.getElementById("rotY");
+	ele.onchange = ele.oninput = function(event) {
+      light[0].rotY=(event.srcElement || event.target).value;
+      document.getElementById("directionval").innerHTML = light[0].rotY;
+   };
+   ele.value = 0;
+   document.getElementById("directionval").innerHTML = 0;
+
+
+   // Specular shininess slider
+	ele = document.getElementById("shininess");
+	ele.onchange = ele.oninput = function(event) {
+      var shininess = (event.srcElement || event.target).value;
+      document.getElementById("shininessval").innerHTML = shininess;
+      gl.uniform1f(material.shininess, shininess);
+   };
+   ele.value = 50;
+   document.getElementById("shininessval").innerHTML = 50;
+
+   // Sphere resolution slider
+	ele = document.getElementById("rez");
+	ele.onchange = ele.oninput = function(event) {
+      rez = (event.srcElement || event.target).value;
+      document.getElementById("rezval").innerHTML = rez;
+   };
+   ele.value = rez;
+   document.getElementById("rezval").innerHTML = rez;
+   
+   
+	phongButton.onchange = ele.oninput = function(event) {
+      OnRadioStateChange(event);
+   };
+   
+   gouraudButton = document.getElementById("gouraud");
+   gouraudButton.onchange = ele.oninput = function(event) {
+      OnRadioStateChange(event);
+   };
+
+   // Diffuse colour picker - set initial value
+   document.getElementById("diffuseColor").jscolor.fromRGB(
+			diffuseColor[0] * 255, 
+			diffuseColor[1] * 255, 
+			diffuseColor[2] * 255);
+
+   // Specular colour picker - set initial value
+   document.getElementById("specularColor").jscolor.fromHSV(
+			specularColor[0] * 255, 
+			specularColor[1] * 255, 
+			specularColor[2] * 255);
 	}
 	else
 	{
