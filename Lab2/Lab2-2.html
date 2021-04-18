@@ -29,11 +29,9 @@ uniform mat4 mv;    // modelview matrix
 //globals
 vec3 N; // fixed surface normal
 
-float scaleFactor = 0.5;
-
 void main() 
 {
-	float displacement = scaleFactor;
+	float displacement = 0.5;
        vec4 displacementDirection = vec4(N.x, N.y, N.z, 0.0);
        vec4 newPosition = vec4(vPosition, 1.0) + (displacement * displacementDirection);
   //Transform the point
