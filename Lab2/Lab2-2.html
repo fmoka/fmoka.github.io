@@ -31,7 +31,7 @@ vec3 N; // fixed surface normal
 
 void main() 
 {
-	float displacement = 0.9;
+	float displacement = 0.05 * 0.5 * (sin(vPosition.y * 25.0) + 1.0);
        vec4 displacementDirection = vec4(N.x, N.y, N.z, 0.0);
        vec4 newPosition = vPosition + (displacement * displacementDirection);
   //Transform the point
