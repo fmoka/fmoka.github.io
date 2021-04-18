@@ -33,7 +33,7 @@ void main()
 {
 	float displacement = 0.5;
        vec4 displacementDirection = vec4(N.x, N.y, N.z, 0.0);
-       vec4 newPosition = vec4(vPosition, 1.0) + (displacement * displacementDirection);
+       vec4 newPosition = vPosition + (displacement * displacementDirection);
   //Transform the point
   mvPosition = mv*newPosition;  //mvPosition is interpolated for pixel lighting
   gl_Position = p*mvPosition; 
