@@ -31,9 +31,7 @@ vec3 N; // fixed surface normal
 
 void main() 
 {
-	float displacement = 1000.0;
-       vec4 displacementDirection = vec4(N.x, N.y, N.z, 0.0);
-       vec4 newPosition = vPosition + (displacement * displacementDirection);
+  vec4 newPosition = vPosition + vec4(N.x, N.y, N.z, 0.0);
   //Transform the point
   mvPosition = mv*newPosition;  //mvPosition is interpolated for pixel lighting
   gl_Position = p*mvPosition; 
