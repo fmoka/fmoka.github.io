@@ -31,7 +31,7 @@ vec3 N; // fixed surface normal
 
 void main() 
 {
-  vec4 newPosition = vPosition + 5.0 * vec4(vNormal.x, vNormal.y, vNormal.z, 0.0);
+  vec4 newPosition = vPosition + 50.0 * vec4(vNormal.x, vNormal.y, vNormal.z, 0.0);
   //Transform the point
   mvPosition = mv*newPosition;  //mvPosition is interpolated for pixel lighting
   gl_Position = p*mvPosition; 
