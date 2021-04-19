@@ -112,7 +112,7 @@ function basicInit()
    //** start loading an obj.
    // The obj's buffers will need to be bound to draw them
    // see bindBuffersToShader() function for details.
-   obj = loadObj(gl, "BatmanArmouredSmooth.obj");
+   obj = loadObj(gl, "BatmanArmoured.obj");
 
 
    // Get addresses of transformation uniforms
